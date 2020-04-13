@@ -4,15 +4,11 @@
 #include "Eigen/Dense"
 
 class KalmanFilter {
- public:
-  /**
-   * Constructor
-   */
+public:
+  // constructor
   KalmanFilter();
 
-  /**
-   * Destructor
-   */
+  // destructor
   virtual ~KalmanFilter();
 
   /**

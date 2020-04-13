@@ -5,26 +5,22 @@
 #include "Eigen/Dense"
 
 class Tools {
- public:
-  /**
-   * Constructor.
-   */
+public:
+  // constructor
   Tools();
 
-  /**
-   * Destructor.
-   */
+  // destructor
   virtual ~Tools();
 
-  /**
-   * A helper method to calculate RMSE.
-   */
-  Eigen::VectorXd CalculateRMSE(const std::vector<Eigen::VectorXd> &estimations, 
+  // Cartesian <-> Polar conversion helpers
+  Eigen::VectorXd Cartesian_to_Polar(const Eigen::VectorXd& v);
+  Eigen::VectorXd Polar_to_Cartesian(const Eigen::VectorXd& v);
+
+  // helper method to calculate RMSE
+  Eigen::VectorXd CalculateRMSE(const std::vector<Eigen::VectorXd> &estimations,
                                 const std::vector<Eigen::VectorXd> &ground_truth);
 
-  /**
-   * A helper method to calculate Jacobians.
-   */
+  // helper method to calculate Jacobians
   Eigen::MatrixXd CalculateJacobian(const Eigen::VectorXd& x_state);
 
 };

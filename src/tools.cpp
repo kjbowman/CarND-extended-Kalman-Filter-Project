@@ -9,6 +9,42 @@ Tools::Tools() {}
 
 Tools::~Tools() {}
 
+VectorXd Cartesian_to_Polar(const VectorXd& cartesian) {
+  const double epsilon = 0.0001
+  VectorXd polar(3);
+
+  double px = cartesian[0];
+  double py = cartesian[1];
+  double vx = cartesian[2];
+  double vy = cartesian[3];
+
+  double rho = sqrt(px*px + py*py);
+  double phi = atan2(py, px);
+  double rhodot (rho > epsilon) ? (px*vx + py*vy) / rho : 0.0;
+
+  polar << rho, phi, rhodot;
+  return polar;
+}
+
+VectorXd Polar_to_Cartesian(const VectorXd& polar) {
+  VectorXd cartesian(4);
+
+  double rho = polar[0];
+  double phi = polar[1];
+  double rhodot = polar[2];
+
+  double cos_phi = cos(phi);
+  double sin_phi = sin(phi);
+
+  double px = rho * cos_phi;
+  double py = rho * sin_phi;
+  double vx = rhodot * cos_phi;
+  double vy = rhodot * sin_phi;
+
+  cartesian << px, py, vx, vy;
+  return cartesian;
+}
+
 VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
                               const vector<VectorXd> &ground_truth) {
   VectorXd rmse(4);
