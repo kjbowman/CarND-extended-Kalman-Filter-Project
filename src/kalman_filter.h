@@ -23,6 +23,9 @@ public:
   void Init(Eigen::VectorXd &x_in, Eigen::MatrixXd &P_in, Eigen::MatrixXd &F_in,
             Eigen::MatrixXd &H_in, Eigen::MatrixXd &R_in, Eigen::MatrixXd &Q_in);
 
+  // update the process noise covariance matrix
+  void UpdateQ(double dt);
+
   /**
    * Prediction Predicts the state and the state covariance
    * using the process model
@@ -42,23 +45,15 @@ public:
    */
   void UpdateEKF(const Eigen::VectorXd &z);
 
-  // state vector
-  Eigen::VectorXd x_;
+  float noise_ax {9.0};
+  float noise_ay {9.0};
 
-  // state covariance matrix
-  Eigen::MatrixXd P_;
-
-  // state transition matrix
-  Eigen::MatrixXd F_;
-
-  // process covariance matrix
-  Eigen::MatrixXd Q_;
-
-  // measurement matrix
-  Eigen::MatrixXd H_;
-
-  // measurement covariance matrix
-  Eigen::MatrixXd R_;
+  Eigen::VectorXd x_;   // state vector
+  Eigen::MatrixXd P_;   // state covariance matrix
+  Eigen::MatrixXd F_;   // state transition matrix
+  Eigen::MatrixXd Q_;   // process covariance matrix
+  Eigen::MatrixXd H_;   // measurement matrix
+  Eigen::MatrixXd R_;   // measurement covariance matrix
 };
 
 #endif // KALMAN_FILTER_H_

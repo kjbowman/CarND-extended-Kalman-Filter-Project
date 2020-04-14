@@ -20,9 +20,9 @@ VectorXd Cartesian_to_Polar(const VectorXd& cartesian) {
 
   double rho = sqrt(px*px + py*py);
   double phi = atan2(py, px);
-  double rhodot (rho > epsilon) ? (px*vx + py*vy) / rho : 0.0;
+  double rho_dot (rho > epsilon) ? (px*vx + py*vy) / rho : 0.0;
 
-  polar << rho, phi, rhodot;
+  polar << rho, phi, rho_dot;
   return polar;
 }
 
@@ -31,15 +31,15 @@ VectorXd Polar_to_Cartesian(const VectorXd& polar) {
 
   double rho = polar[0];
   double phi = polar[1];
-  double rhodot = polar[2];
+  double rho_dot = polar[2];
 
   double cos_phi = cos(phi);
   double sin_phi = sin(phi);
 
   double px = rho * cos_phi;
   double py = rho * sin_phi;
-  double vx = rhodot * cos_phi;
-  double vy = rhodot * sin_phi;
+  double vx = rho_dot * cos_phi;
+  double vy = rho_dot * sin_phi;
 
   cartesian << px, py, vx, vy;
   return cartesian;

@@ -12,8 +12,14 @@ public:
   // destructor
   virtual ~Tools();
 
-  // Cartesian <-> Polar conversion helpers
+  // helper method to convert Cartesian to polor
+  // @param v vector(x, y, vx, vy)
+  // @return vector(rho, phi, rho_dot)
   Eigen::VectorXd Cartesian_to_Polar(const Eigen::VectorXd& v);
+
+  // helper method to convert polar to Cartesian
+  // @param v vector(rho, phi, rho_dot)
+  // @return vector(x, y, vx, vy)
   Eigen::VectorXd Polar_to_Cartesian(const Eigen::VectorXd& v);
 
   // helper method to calculate RMSE

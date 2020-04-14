@@ -1,4 +1,5 @@
 #include "kalman_filter.h"
+#include "tools.h"
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -22,19 +23,29 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
   Q_ = Q_in;
 }
 
+void KalmanFilter::UpdateQ(double dt) {
+  Q_ = MatrixXd(4,4);
+  dt2 = dt * dt;
+  dt3_2 = (dt * dt2)/2.0;
+  dt4_4 = (dt2 * dt2)/4.0;
+  
+  Q_ << dt4_4*noise_ax, 0,              dt3_2*noise_ax, 0,
+        0,              dt4_4*noise_ay, 0,              dt3_2*noise_ay,
+        dt3_2*noise_ax, 0,              dt2*noise_ax,   0,
+        0,              dt3_2*noise_ay, 0,              dt2*noise_ay;
+}
+
 void KalmanFilter::Predict() {
   x_ = F_ * x_;
   P_ = F_ * P_ * F_.transpose() + Q_;
 }
 
+// for Lidar measurements
 void KalmanFilter::Update(const VectorXd &z) {
-  VectorXd z_pred = H_ * x_;
-  VectorXd y = z - z_pred;
+  VectorXd y = z - H_ * x_;
   MatrixXd Ht = H_.transpose();
   MatrixXd S = H_ * P_ * Ht + R_;
-  MatrixXd Si = S.inverse();
-  MatrixXd PHt = P_ * Ht;
-  MatrixXd K = PHt * Si;
+  MatrixXd K = P_ * Ht * S.inverse();
 
   //new estimate
   x_ = x_ + (K * y);
@@ -43,8 +54,22 @@ void KalmanFilter::Update(const VectorXd &z) {
   P_ = (I - K * H_) * P_;
 }
 
+// for Radar measurements
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
-  /**
-   * TODO: update the state by using Extended Kalman Filter equations
-   */
+   MatrixXd Hj = Tools::CalculateJacobian(z);
+   MatrixXd Hx = Tools::Cartesian_to_Polar(x_);
+   VectorXd y = z - Hx;
+   // normalize angle in y vector
+   double phi = y(1)
+   y(1) = atan2(sin(phi), cos(phi))
+
+   MatrixXd Ht = Hj.transpose();
+   MatrixXd S = Hj * P_ * Ht * R_;
+   MatrixXd K = P_ * Ht * S.inverse();
+
+   // new estimate
+   x_ = x_ + (K * y);
+   long x_size = x_.size();
+   MatrixXd I = MatrixXd::Identity(x_size, x_size);
+   P_ = (I - K * Hj) * P_;
 }
