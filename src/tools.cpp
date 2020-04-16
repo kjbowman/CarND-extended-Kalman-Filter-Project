@@ -4,13 +4,15 @@
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
 using std::vector;
+using std::cout;
+using std::endl;
 
 Tools::Tools() {}
 
 Tools::~Tools() {}
 
 VectorXd Cartesian_to_Polar(const VectorXd& cartesian) {
-  const double epsilon = 0.0001
+  const double epsilon = 0.0001;
   VectorXd polar(3);
 
   double px = cartesian[0];
@@ -20,7 +22,7 @@ VectorXd Cartesian_to_Polar(const VectorXd& cartesian) {
 
   double rho = sqrt(px*px + py*py);
   double phi = atan2(py, px);
-  double rho_dot (rho > epsilon) ? (px*vx + py*vy) / rho : 0.0;
+  double rho_dot = (rho > epsilon) ? (px*vx + py*vy) / rho : 0.0;
 
   polar << rho, phi, rho_dot;
   return polar;
@@ -93,7 +95,7 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   float root3_2_px2_py2 = pow(px2_py2, 1.5);
 
   // check division by zero
-  if(fabs(px2_px2) < 0.0001) {
+  if(fabs(px2_py2) < 0.0001) {
       cout << "CalculateJacobian() - Error - Division by zero" << endl;
       return Hj;
   }
