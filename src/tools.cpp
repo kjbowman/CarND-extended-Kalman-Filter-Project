@@ -11,7 +11,7 @@ Tools::Tools() {}
 
 Tools::~Tools() {}
 
-VectorXd Cartesian_to_Polar(const VectorXd& cartesian) {
+VectorXd Tools::Cartesian_to_Polar(const VectorXd& cartesian) {
   const double epsilon = 0.0001;
   VectorXd polar(3);
 
@@ -28,7 +28,7 @@ VectorXd Cartesian_to_Polar(const VectorXd& cartesian) {
   return polar;
 }
 
-VectorXd Polar_to_Cartesian(const VectorXd& polar) {
+VectorXd Tools::Polar_to_Cartesian(const VectorXd& polar) {
   VectorXd cartesian(4);
 
   double rho = polar[0];

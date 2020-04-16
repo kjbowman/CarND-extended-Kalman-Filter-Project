@@ -15,12 +15,12 @@ public:
   // helper method to convert Cartesian to polor
   // @param v vector(x, y, vx, vy)
   // @return vector(rho, phi, rho_dot)
-  Eigen::VectorXd Cartesian_to_Polar(const Eigen::VectorXd& v);
+  Eigen::VectorXd Cartesian_to_Polar(const Eigen::VectorXd& cartesian);
 
   // helper method to convert polar to Cartesian
   // @param v vector(rho, phi, rho_dot)
   // @return vector(x, y, vx, vy)
-  Eigen::VectorXd Polar_to_Cartesian(const Eigen::VectorXd& v);
+  Eigen::VectorXd Polar_to_Cartesian(const Eigen::VectorXd& polar);
 
   // helper method to calculate RMSE
   Eigen::VectorXd CalculateRMSE(const std::vector<Eigen::VectorXd> &estimations,

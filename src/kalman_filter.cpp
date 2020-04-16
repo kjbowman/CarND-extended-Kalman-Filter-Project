@@ -57,8 +57,8 @@ void KalmanFilter::Update(const VectorXd &z) {
 // for Radar measurements
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
   Tools tools;
-  
-  MatrixXd Hx = tools.Cartesian_to_Polar(x_);
+
+  VectorXd Hx = tools.Cartesian_to_Polar(x_);
   VectorXd y = z - Hx;
   // normalize angle in y vector (limit to +/- pi)
   double phi = y(1);
