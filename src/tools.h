@@ -29,6 +29,8 @@ public:
   // helper method to calculate Jacobians
   Eigen::MatrixXd CalculateJacobian(const Eigen::VectorXd& x_state);
 
+private:
+  const double epsilon_ {0.0001};
 };
 
 #endif  // TOOLS_H_

@@ -1,6 +1,9 @@
 #include "kalman_filter.h"
 #include "tools.h"
+#include <iostream>
 
+using std::cout;
+using std::endl;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
@@ -12,16 +15,6 @@ using Eigen::VectorXd;
 KalmanFilter::KalmanFilter() {}
 
 KalmanFilter::~KalmanFilter() {}
-
-void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
-                        MatrixXd &H_in, MatrixXd &R_in, MatrixXd &Q_in) {
-  x_ = x_in;
-  P_ = P_in;
-  F_ = F_in;
-  H_ = H_in;
-  R_ = R_in;
-  Q_ = Q_in;
-}
 
 void KalmanFilter::UpdateQ(double dt) {
   Q_ = MatrixXd(4,4);
@@ -35,6 +28,11 @@ void KalmanFilter::UpdateQ(double dt) {
               0,        dt3_2*noise_ay,       0,        dt2*noise_ay;
 }
 
+void KalmanFilter::UpdateF(double dt) {
+  F_(0,2) = dt;
+  F_(1,3) = dt;
+}
+
 void KalmanFilter::Predict() {
   x_ = F_ * x_;
   P_ = F_ * P_ * F_.transpose() + Q_;
@@ -42,35 +40,34 @@ void KalmanFilter::Predict() {
 
 // for Lidar measurements
 void KalmanFilter::Update(const VectorXd &z) {
-  VectorXd y = z - H_ * x_;
-  MatrixXd Ht = H_.transpose();
-  MatrixXd S = H_ * P_ * Ht + R_;
-  MatrixXd K = P_ * Ht * S.inverse();
+  VectorXd y = z - (H_ * x_);
 
-  //new estimate
-  x_ = x_ + (K * y);
-  long x_size = x_.size();
-  MatrixXd I = MatrixXd::Identity(x_size, x_size);
-  P_ = (I - K * H_) * P_;
+  UpdateCommon(y, H_);
 }
 
 // for Radar measurements
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
   Tools tools;
 
-  VectorXd Hx = tools.Cartesian_to_Polar(x_);
-  VectorXd y = z - Hx;
-  // normalize angle in y vector (limit to +/- pi)
-  double phi = y(1);
-  y(1) = atan2(sin(phi), cos(phi));
+  VectorXd hx = VectorXd(3);
+  hx = tools.Cartesian_to_Polar(x_);
 
-  MatrixXd Ht = H_.transpose();
-  MatrixXd S = H_ * P_ * Ht * R_;
-  MatrixXd K = P_ * Ht * S.inverse();
+  VectorXd y = z - hx;
+  y(1) = atan2(sin(y(1)), cos(y(1))); // normalize angle to [-pi, pi]
 
-  // new estimate
+  MatrixXd Hj = tools.CalculateJacobian(x_);
+
+  UpdateCommon(y, Hj);
+}
+
+// common to both Lidar and Radar, given the appropriate H matrix
+void KalmanFilter::UpdateCommon(const VectorXd &y, const MatrixXd &H) {
+  MatrixXd Ht = H.transpose();
+  MatrixXd S = H * P_ * Ht + R_;
+  MatrixXd K = (P_ * Ht) * S.inverse();
+
   x_ = x_ + (K * y);
   long x_size = x_.size();
   MatrixXd I = MatrixXd::Identity(x_size, x_size);
-  P_ = (I - K * H_) * P_;
+  P_ = (I - K * H) * P_;
 }
